@@ -31,7 +31,12 @@
             {{ getStatusLabel(data.status) }}
           </template>
         </Column>
-        <Column header="Proyecto" :body="(row) => row.project?.name" />
+        <Column header="Proyecto">
+          <template #body="{ data }">
+            {{ data.project_name || "N/A" }}
+          </template>
+        </Column>
+
         <Column header="Acciones">
           <template #body="{ data }">
             <Button

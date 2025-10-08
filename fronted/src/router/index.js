@@ -6,22 +6,30 @@ import ProjectsView from '@/views/Projects/ProjectList.vue'
 import TasksView from '@/views/Tasks/TaskList.vue'
 import { useAuthStore } from '@/stores/auth'
 
+
 const routes = [
-  { path: '/login', component: LoginView, name: 'login' },
-  { path: '/register', component: RegisterView, name: 'register' },
-  { path: '/', component: DashboardView, meta: { requiresAuth: true } },
-  { path: '/projects', component: ProjectsView, meta: { requiresAuth: true } },
-  { path: '/tasks', component: TasksView, meta: { requiresAuth: true } },
+  { path: "/login", component: LoginView },
+  { path: "/register", component: RegisterView },
+  { path: "/", redirect: "/dashboard" }, 
+  { path: "/dashboard", component: DashboardView, meta: { requiresAuth: true } },
+  { path: "/projects", component: ProjectsView, meta: { requiresAuth: true } },
+  { path: "/tasks", component: TasksView, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
-  if (to.meta.requiresAuth && !auth.isLoggedIn) return next('/login');
+  if (to.meta.requiresAuth && (!auth.user || !auth.token)) {
+    return next("/login");
+  }
+  if ((to.path === "/login" || to.path === "/register") && auth.user && auth.token) {
+    return next("/dashboard");
+  }
+
   next();
 });
 
